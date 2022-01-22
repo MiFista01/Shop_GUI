@@ -10,6 +10,8 @@ import facade.ShoesFacade;
 import gui.components.button;
 import gui.components.editor;
 import gui.components.label;
+import gui.components.list_person;
+import gui.components.list_purchase;
 import gui.components.list_shoes;
 import gui.profile.profile_label;
 import java.awt.Dimension;
@@ -33,12 +35,17 @@ public class GUIapp extends JFrame{
     PersonFacade personFacade = new PersonFacade(Person.class);
     ShoesFacade shoesFacade = new ShoesFacade(Shoes.class);
     PurchaseFacade purchaseFacade = new PurchaseFacade(Purchase.class);
+    
     JPanel panel = new JPanel();
     label program_topic = new label(w,50,"Shop of shoes",1,15);
     label warning = new label(w,20,"You don't have some information",1,10);
     button author;
     button reg;
-    Long id;
+    
+    JPanel my_advert = new JPanel();
+    static GUIapp gui =  new GUIapp();
+    
+    public static Long id;
 
 
     public GUIapp() {
@@ -159,7 +166,7 @@ public class GUIapp extends JFrame{
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable(){
             public void run(){
-                new GUIapp().setVisible(true);
+               gui.setVisible(true);
             }
         });
     }
@@ -260,9 +267,13 @@ public class GUIapp extends JFrame{
             });
             profile.add(add_money);
             profile.add(log_out);
-        JPanel purchase = new JPanel();
-        tabs.add("My purchase", purchase);
-        
+            
+            
+        JPanel purchases = new JPanel();
+        tabs.add("My purchase", purchases);
+        list_purchase list2 = new list_purchase(w-50,"aaa",w,200);
+        purchases.add(list2);
+
         
         JPanel buy = new JPanel();
         tabs.add("buy shoes", buy);
@@ -275,20 +286,29 @@ public class GUIapp extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 Shoes value = list1.getList().getSelectedValue();
-                if(personFacade.findById(id).getPurse()>= value.getPrice()){
+                if(personFacade.findById(id).getPurse()>= value.getPrice() && value.getCount()>0){
                     personFacade.findById(id).setPurse(Math.ceil(
                     personFacade.findById(id).getPurse()*100-value.getPrice()*100)/100);
                     value.setCount(value.getCount()-1);
+                    value.getPerson().setIncome(value.getPerson().getIncome()+value.getPrice());
+                    value.getPerson().setPurse(Math.ceil(
+                    value.getPerson().getPurse()*100+value.getPrice()*100)/100);
                     personFacade.edit(personFacade.findById(id));
+                    personFacade.edit(value.getPerson());
                     shoesFacade.edit(value);
                     panel.revalidate();
                     panel.repaint();
                     my_money.getLabel().setText("Money: "+personFacade.findById(id).getPurse());
                     profile_purse.getLabel().setText("Purse: "+personFacade.findById(id).getPurse());
-                    Purchase purchase = new Purchase();
-                    purchase.setPerson(personFacade.findById(id));
-                    purchase.setShoes(value);
-                    purchaseFacade.create(purchase);
+                    Purchase purchas = new Purchase();
+                    purchas.setPerson(personFacade.findById(id));
+                    purchas.setShoes(value);
+                    purchaseFacade.create(purchas);
+                    buy.removeAll();
+                    list_shoes list1 = new list_shoes(w-50,"aaa",w,200);
+                    buy.add(my_money);
+                    buy.add(list1);
+                    
                 }
             }
         });
@@ -397,9 +417,15 @@ public class GUIapp extends JFrame{
                         prise.getText().setText("");
                         size.getText().setText("");
                         count.getText().setText("");
+                        buy.removeAll();
+                        list_shoes list1 = new list_shoes(w-50,"aaa",w,200);
+                        buy.add(my_money);
+                        buy.add(list1);
                         panel.revalidate();
                         panel.repaint();
-                        
+                        my_advert.removeAll();
+                        list_person list3 = new list_person(w-50,"aaa",w,200);
+                        my_advert.add(list3);
                     }
                     catch(Exception aq){
                         war7.setVisible(true);
@@ -411,5 +437,115 @@ public class GUIapp extends JFrame{
             
         });
         sell.add(SELL);
+        my_advert = new JPanel();
+        tabs.add("My advert",my_advert);
+        list_person list3 = new list_person(w-50,"aaa",w,200);
+        my_advert.add(list3);
+        button change = new button("Chsnge product",150,30);
+        change.getButton().addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Shoes value = list3.getList().getSelectedValue();
+                if (value != null){
+                    JFrame frame = new JFrame();
+                    JPanel panel2 = new JPanel();
+                    frame.add(panel2);
+                    w = 700;
+                    h = 500;
+                    frame.setSize(w,h);
+                    frame.setVisible(true);
+                    label war1 = new label(w,20,"You didn't write firma's name",1,10);
+                    label war2 = new label(w,20,"You didn't write shoes color",1,10);
+                    label war3 = new label(w,20,"You didn't write model",1,10);
+                    label war4 = new label(w,20,"You didn't write prise",1,10);
+                    label war5 = new label(w,20,"You didn't write size",1,10);
+                    label war6 = new label(w,20,"You didn't write count",1,10);
+                    label war7 = new label(w,30,"Inappropriate data",1,15);
+                    war1.setVisible(false);
+                    war2.setVisible(false);
+                    war3.setVisible(false);
+                    war4.setVisible(false);
+                    war5.setVisible(false);
+                    war6.setVisible(false);
+                    war7.setVisible(false);
+                    
+                    editor firma = new editor(w,20,"firma:",1,12,w/3,20,w/3*2,20);
+                    editor color = new editor(w,20,"color:",1,12,w/3,20,w/3*2,20);
+                    editor model = new editor(w,20,"model:",1,12,w/3,20,w/3*2,20);
+                    editor prise = new editor(w,20,"prise:",1,12,w/3,20,w/3*2,20);
+                    editor size = new editor(w,20,"size:",1,12,w/3,20,w/3*2,20);
+                    panel2.add(firma);
+                    panel2.add(war1);
+                    panel2.add(color);
+                    panel2.add(war2);
+                    panel2.add(model);
+                    panel2.add(war3);
+                    panel2.add(prise);
+                    panel2.add(war4);
+                    panel2.add(size);
+                    panel2.add(war5);
+                    //gui.setEnabled(false);
+                    button changes = new button("change",150,30);
+                    changes.getButton().addActionListener(new ActionListener(){
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if(firma.getText().getText().equals("")){
+                            war1.setVisible(true);
+                        }
+                        if(color.getText().getText().equals("")){
+                            war2.setVisible(true);
+                        }
+                        if(model.getText().getText().equals("")){
+                            war3.setVisible(true);
+                        }
+                        if(prise.getText().getText().equals("")){
+                            war4.setVisible(true);
+                        }
+                        if(size.getText().getText().equals("")){
+                            war5.setVisible(true);
+                        }
+                        if(count.getText().getText().equals("")){
+                            war6.setVisible(true);
+                        }
+                        if((!firma.getText().getText().equals(""))&&(!color.getText().getText().equals(""))&&
+                        (!model.getText().getText().equals(""))&&(!prise.getText().getText().equals(""))&&
+                        (!size.getText().getText().equals(""))){
+                            try{
+                                war7.setVisible(false);
+                                Shoes shoes = new Shoes();
+                                shoes.setFirma(firma.getText().getText());
+                                shoes.setColor(color.getText().getText());
+                                shoes.setModel(model.getText().getText());
+                                shoes.setPrice(Double.parseDouble(prise.getText().getText()));
+                                shoes.setSize(Integer.parseInt (size.getText().getText()));
+                                shoes.setPerson(personFacade.findById(id));
+                                shoesFacade.create(shoes);
+
+                                firma.getText().setText("");
+                                color.getText().setText("");
+                                model.getText().setText("");
+                                prise.getText().setText("");
+                                size.getText().setText("");
+                                my_advert.removeAll();
+                                list_shoes list3 = new list_shoes(w-50,"aaa",w,200);
+                                my_advert.add(list3);
+                                my_advert.revalidate();
+                                my_advert.repaint();
+
+                            }
+                            catch(Exception aq){
+                                war7.setVisible(true);
+                            }
+
+                        }
+                    }
+                });
+                panel2.add(changes);
+                }
+                
+            }
+        });
+        my_advert.add(change);
     }
+    
 }

@@ -42,5 +42,10 @@ public class Purchase {
         this.shoes = shoes;
     }
 
+    @Override
+    public String toString() {
+        return "Purchase{" + "id=" + id + ", person=" + person + ", shoes=" + shoes + '}';
+    }
+    
     
 }

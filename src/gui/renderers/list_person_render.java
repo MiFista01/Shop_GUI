@@ -9,7 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.UIManager;
 
-public class list_shoes_render extends DefaultListCellRenderer{
+public class list_person_render extends DefaultListCellRenderer{
     private final Color background = new Color(0, 100, 255, 15);
     private final Color defaultBackground = (Color) UIManager.get("List.background");
     
@@ -19,7 +19,7 @@ public class list_shoes_render extends DefaultListCellRenderer{
         if(component instanceof JLabel){
             Shoes shoes = (Shoes) value;
             JLabel label = new JLabel();
-            if (GUIapp.id != shoes.getPerson().getId() && shoes.getCount()>0){
+            if (GUIapp.id == shoes.getPerson().getId()&& shoes.getCount()>0){
                 label = (JLabel) component;
             
                 label.setText(String.format(
