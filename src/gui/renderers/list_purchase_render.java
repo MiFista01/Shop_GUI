@@ -26,20 +26,18 @@ public class list_purchase_render extends DefaultListCellRenderer{
                 label = (JLabel) component;
             
                 label.setText(String.format(
+                    "Name: "+purchase.getPerson().getName()+"  "+
+                    "Phone: "+purchase.getPerson().getPhone()+"  "+
                     "Firma: "+purchase.getShoes().getFirma()+"  "+
                     "Color: "+purchase.getShoes().getColor()+"  "+
                     "Model: "+purchase.getShoes().getModel()+"  "+
                     "Size: "+purchase.getShoes().getSize()+"  "+
-                    "Price: "+purchase.getShoes().getPrice()+"  "+
-                    "Count: "+purchase.getShoes().getCount()
+                    "Price: "+purchase.getShoes().getPrice()+"  "
             ));
             }else{
                 component = new Component() {}; 
             }
 
-            if(!isSelected){
-                label.setBackground(index % 2 == 0 ? background : defaultBackground);
-            }
         }
         return component;}
     

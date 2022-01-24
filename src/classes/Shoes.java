@@ -13,8 +13,6 @@ public class Shoes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private Person person;
     private String firma;
     private String color;
     private String model;
@@ -84,13 +82,4 @@ public class Shoes {
         return "Shoes{" + "id=" + id + ", firma=" + firma + ", color=" + color + ", model=" + model + ", price=" + price + ", size=" + size + ", count=" + count + ", date=" + '}';
     }
 
-    public Person getPerson() {
-        return person;
-    }
-
-    public void setPerson(Person person) {
-        this.person = person;
-    }
-    
-    
 }

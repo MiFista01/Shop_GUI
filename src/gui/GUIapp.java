@@ -3,30 +3,26 @@ package gui;
 
 import classes.Person;
 import classes.Purchase;
+import classes.Sale;
 import classes.Shoes;
 import facade.PersonFacade;
 import facade.PurchaseFacade;
+import facade.SaleFacade;
 import facade.ShoesFacade;
 import gui.components.button;
 import gui.components.editor;
 import gui.components.label;
-import gui.components.list_person;
 import gui.components.list_purchase;
-import gui.components.list_shoes;
+import gui.components.list_sale;
 import gui.profile.profile_label;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.Vector;
-import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.ListModel;
 
 public class GUIapp extends JFrame{
     public static int w = 400;
@@ -35,19 +31,27 @@ public class GUIapp extends JFrame{
     PersonFacade personFacade = new PersonFacade(Person.class);
     ShoesFacade shoesFacade = new ShoesFacade(Shoes.class);
     PurchaseFacade purchaseFacade = new PurchaseFacade(Purchase.class);
+    SaleFacade saleFacade = new SaleFacade (Sale.class);
     
     JPanel panel = new JPanel();
+    JTabbedPane tabs = new JTabbedPane();
+    JPanel profile = new JPanel();
+    JPanel purchases = new JPanel();
+    JPanel sells = new JPanel();
+    JPanel shopping = new JPanel();
+    JPanel advert = new JPanel();
+    
     label program_topic = new label(w,50,"Shop of shoes",1,15);
     label warning = new label(w,20,"You don't have some information",1,10);
     button author;
     button reg;
-    
-    JPanel my_advert = new JPanel();
     static GUIapp gui =  new GUIapp();
     
     public static Long id;
-
-
+    
+    list_sale list_purchases = new list_sale(w+200,"aaa",w,300);
+    list_purchase my_purchases = new list_purchase(w+200,"aaa",w,300);
+    
     public GUIapp() {
         initComponents();
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -70,6 +74,7 @@ public class GUIapp extends JFrame{
                 panel.removeAll();
                 editor name = new editor(w,20,"Name:",1,15,w/3-10,20,w/3*2-5,20);
                 editor password = new editor(w/3,20,"Password:",1,15,w/3-10,20,w/3*2-5,20);
+                
                 button authorize = new button("authorize",100,20);
                 authorize.getButton().addActionListener(new ActionListener(){
                     @Override
@@ -117,7 +122,6 @@ public class GUIapp extends JFrame{
                 editor editor2 = new editor(w/3,20,"Password:",1,15,w/3-10,20,w/3*2-5,20);
                 editor editor3 = new editor(w/3,20,"Phone:",1,15,w/3-10,20,w/3*2-5,20);
                 warning.setVisible(false);
-                //label1.setForeground(new java.awt.Color(255,0,0));
                 button registration = new button("Register",100,20);
                 registration.getButton().addActionListener(new ActionListener(){
                     @Override
@@ -189,17 +193,17 @@ public class GUIapp extends JFrame{
             return exit;
         }
     private void PROFILE(){
+        label my_money = new label(w,30,"Money: "+personFacade.findById(id).getPurse(),1,15);
+        
         w = 700;
         h = 500;
         GUIapp.this.setSize(w,h);
         panel.removeAll();
-        JTabbedPane tabs = new JTabbedPane();
         tabs.setPreferredSize(new Dimension(w, h));
         tabs.setMinimumSize(tabs.getPreferredSize());
         tabs.setMaximumSize(tabs.getPreferredSize());
         panel.add(tabs);
 
-        JPanel profile = new JPanel();
         tabs.add("Profile", profile);
             JPanel Info = new JPanel();
             Info.setSize(w/2, h);
@@ -228,6 +232,13 @@ public class GUIapp extends JFrame{
                     back.getButton().addActionListener(new ActionListener(){
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                            tabs.removeAll();
+                            panel.removeAll();
+                            profile.removeAll();
+                            shopping.removeAll();
+                            sells.removeAll();
+                            purchases.removeAll();
+                            advert.removeAll();
                             PROFILE();
                         }
                     });
@@ -259,7 +270,13 @@ public class GUIapp extends JFrame{
                     w = 400;
                     h = 200;
                     GUIapp.this.setSize(w,h);
+                    tabs.removeAll();
                     panel.removeAll();
+                    profile.removeAll();
+                    shopping.removeAll();
+                    sells.removeAll();
+                    purchases.removeAll();
+                    advert.removeAll();
                     panel.add(program_topic);
                     panel.add(reg);
                     panel.add(author);
@@ -269,198 +286,56 @@ public class GUIapp extends JFrame{
             profile.add(log_out);
             
             
-        JPanel purchases = new JPanel();
-        tabs.add("My purchase", purchases);
-        list_purchase list2 = new list_purchase(w-50,"aaa",w,200);
-        purchases.add(list2);
-
-        
-        JPanel buy = new JPanel();
-        tabs.add("buy shoes", buy);
-        label my_money = new label(w,30,"Money: "+personFacade.findById(id).getPurse(),1,15);
-        list_shoes list1 = new list_shoes(w-50,"aaa",w,200);
-        buy.add(my_money);
-        buy.add(list1);
-        button BUY = new button("Buy",100,20);
-        BUY.getButton().addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Shoes value = list1.getList().getSelectedValue();
-                if(personFacade.findById(id).getPurse()>= value.getPrice() && value.getCount()>0){
-                    personFacade.findById(id).setPurse(Math.ceil(
-                    personFacade.findById(id).getPurse()*100-value.getPrice()*100)/100);
-                    value.setCount(value.getCount()-1);
-                    value.getPerson().setIncome(value.getPerson().getIncome()+value.getPrice());
-                    value.getPerson().setPurse(Math.ceil(
-                    value.getPerson().getPurse()*100+value.getPrice()*100)/100);
-                    personFacade.edit(personFacade.findById(id));
-                    personFacade.edit(value.getPerson());
-                    shoesFacade.edit(value);
-                    panel.revalidate();
-                    panel.repaint();
-                    my_money.getLabel().setText("Money: "+personFacade.findById(id).getPurse());
-                    profile_purse.getLabel().setText("Purse: "+personFacade.findById(id).getPurse());
-                    Purchase purchas = new Purchase();
-                    purchas.setPerson(personFacade.findById(id));
-                    purchas.setShoes(value);
-                    purchaseFacade.create(purchas);
-                    buy.removeAll();
-                    list_shoes list1 = new list_shoes(w-50,"aaa",w,200);
-                    buy.add(my_money);
-                    buy.add(list1);
-                    
-                }
-            }
-        });
-        buy.add(BUY);
-        
-        JPanel sell = new JPanel();
-        tabs.add("Sell shoes", sell);
-        label war1 = new label(w,20,"You didn't write firma's name",1,10);
-        label war2 = new label(w,20,"You didn't write shoes color",1,10);
-        label war3 = new label(w,20,"You didn't write model",1,10);
-        label war4 = new label(w,20,"You didn't write prise",1,10);
-        label war5 = new label(w,20,"You didn't write size",1,10);
-        label war6 = new label(w,20,"You didn't write count",1,10);
-        label war7 = new label(w,30,"Inappropriate data",1,15);
-        war1.setVisible(false);
-        war2.setVisible(false);
-        war3.setVisible(false);
-        war4.setVisible(false);
-        war5.setVisible(false);
-        war6.setVisible(false);
-        war7.setVisible(false);
-        
-        editor firma = new editor(w,15,"firma:",1,12,w/3,20,w/3*2,15);
-        editor color = new editor(w,15,"color:",1,12,w/3,20,w/3*2,15);
-        editor model = new editor(w,15,"model:",1,12,w/3,20,w/3*2,15);
-        editor prise = new editor(w,15,"prise:",1,12,w/3,20,w/3*2,15);
-        editor size = new editor(w,15,"size:",1,12,w/3,20,w/3*2,15);
-        editor count = new editor(w,15,"count:",1,12,w/3,20,w/3*2,15);
-        sell.add(firma);
-        sell.add(war1);
-        sell.add(color);
-        sell.add(war2);
-        sell.add(model);
-        sell.add(war3);
-        sell.add(prise);
-        sell.add(war4);
-        sell.add(size);
-        sell.add(war5);
-        sell.add(count);
-        sell.add(war6);
-        sell.add(war7);
-        
-
-        button clean = new button("Clean",100,30);
-        clean.getButton().addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                firma.getText().setText("");
-                color.getText().setText("");
-                model.getText().setText("");
-                prise.getText().setText("");
-                size.getText().setText("");
-                count.getText().setText("");
-                war1.setVisible(false);
-                war2.setVisible(false);
-                war3.setVisible(false);
-                war4.setVisible(false);
-                war5.setVisible(false);
-                war6.setVisible(false);
-                war7.setVisible(false);
-                
-            }
-        
-        });
-        sell.add(clean);
-        button SELL = new button("Sell shoes",100,30);
-        SELL.getButton().addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(firma.getText().getText().equals("")){
-                    war1.setVisible(true);
-                }
-                if(color.getText().getText().equals("")){
-                    war2.setVisible(true);
-                }
-                if(model.getText().getText().equals("")){
-                    war3.setVisible(true);
-                }
-                if(prise.getText().getText().equals("")){
-                    war4.setVisible(true);
-                }
-                if(size.getText().getText().equals("")){
-                    war5.setVisible(true);
-                }
-                if(count.getText().getText().equals("")){
-                    war6.setVisible(true);
-                }
-                if((!firma.getText().getText().equals(""))&&(!color.getText().getText().equals(""))&&
-                (!model.getText().getText().equals(""))&&(!prise.getText().getText().equals(""))&&
-                (!size.getText().getText().equals(""))&&(!count.getText().getText().equals(""))){
-                    try{
-                        war7.setVisible(false);
-                        Shoes shoes = new Shoes();
-                        shoes.setFirma(firma.getText().getText());
-                        shoes.setColor(color.getText().getText());
-                        shoes.setModel(model.getText().getText());
-                        shoes.setPrice(Double.parseDouble(prise.getText().getText()));
-                        shoes.setSize(Integer.parseInt (size.getText().getText()));
-                        shoes.setCount(Integer.parseInt (count.getText().getText()));
-                        shoes.setPerson(personFacade.findById(id));
-                        shoesFacade.create(shoes);
-                        
-                        firma.getText().setText("");
-                        color.getText().setText("");
-                        model.getText().setText("");
-                        prise.getText().setText("");
-                        size.getText().setText("");
-                        count.getText().setText("");
-                        buy.removeAll();
-                        list_shoes list1 = new list_shoes(w-50,"aaa",w,200);
-                        buy.add(my_money);
-                        buy.add(list1);
-                        panel.revalidate();
-                        panel.repaint();
-                        my_advert.removeAll();
-                        list_person list3 = new list_person(w-50,"aaa",w,200);
-                        my_advert.add(list3);
-                    }
-                    catch(Exception aq){
-                        war7.setVisible(true);
-                    }
-
-                }
-                
-            }
+            tabs.add("My purchases", shopping);
+            shopping.add(my_purchases);
             
-        });
-        sell.add(SELL);
-        my_advert = new JPanel();
-        tabs.add("My advert",my_advert);
-        list_person list3 = new list_person(w-50,"aaa",w,200);
-        my_advert.add(list3);
-        button change = new button("Chsnge product",150,30);
-        change.getButton().addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Shoes value = list3.getList().getSelectedValue();
-                if (value != null){
-                    JFrame frame = new JFrame();
-                    JPanel panel2 = new JPanel();
-                    frame.add(panel2);
-                    w = 700;
-                    h = 500;
-                    frame.setSize(w,h);
-                    frame.setVisible(true);
-                    label war1 = new label(w,20,"You didn't write firma's name",1,10);
-                    label war2 = new label(w,20,"You didn't write shoes color",1,10);
-                    label war3 = new label(w,20,"You didn't write model",1,10);
-                    label war4 = new label(w,20,"You didn't write prise",1,10);
-                    label war5 = new label(w,20,"You didn't write size",1,10);
-                    label war6 = new label(w,20,"You didn't write count",1,10);
-                    label war7 = new label(w,30,"Inappropriate data",1,15);
+            
+            tabs.add("Sell product",sells);
+            label war1 = new label(w,20,"You didn't write firma's name",1,10);
+            label war2 = new label(w,20,"You didn't write shoes color",1,10);
+            label war3 = new label(w,20,"You didn't write model",1,10);
+            label war4 = new label(w,20,"You didn't write prise",1,10);
+            label war5 = new label(w,20,"You didn't write size",1,10);
+            label war6 = new label(w,20,"You didn't write count",1,10);
+            label war7 = new label(w,30,"Wrong data",1,15);
+            war1.setVisible(false);
+            war2.setVisible(false);
+            war3.setVisible(false);
+            war4.setVisible(false);
+            war5.setVisible(false);
+            war6.setVisible(false);
+            war7.setVisible(false);
+
+            editor firma = new editor(w,15,"firma:",1,12,w/3,20,w/3*2,15);
+            editor color = new editor(w,15,"color:",1,12,w/3,20,w/3*2,15);
+            editor model = new editor(w,15,"model:",1,12,w/3,20,w/3*2,15);
+            editor prise = new editor(w,15,"prise:",1,12,w/3,20,w/3*2,15);
+            editor size = new editor(w,15,"size:",1,12,w/3,20,w/3*2,15);
+            editor count = new editor(w,15,"count:",1,12,w/3,20,w/3*2,15);
+            sells.add(firma);
+            sells.add(war1);
+            sells.add(color);
+            sells.add(war2);
+            sells.add(model);
+            sells.add(war3);
+            sells.add(prise);
+            sells.add(war4);
+            sells.add(size);
+            sells.add(war5);
+            sells.add(count);
+            sells.add(war6);
+            sells.add(war7);
+            
+            button clean = new button("Clean",100,30);
+            clean.getButton().addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    firma.getText().setText("");
+                    color.getText().setText("");
+                    model.getText().setText("");
+                    prise.getText().setText("");
+                    size.getText().setText("");
+                    count.getText().setText("");
                     war1.setVisible(false);
                     war2.setVisible(false);
                     war3.setVisible(false);
@@ -468,84 +343,116 @@ public class GUIapp extends JFrame{
                     war5.setVisible(false);
                     war6.setVisible(false);
                     war7.setVisible(false);
-                    
-                    editor firma = new editor(w,20,"firma:",1,12,w/3,20,w/3*2,20);
-                    editor color = new editor(w,20,"color:",1,12,w/3,20,w/3*2,20);
-                    editor model = new editor(w,20,"model:",1,12,w/3,20,w/3*2,20);
-                    editor prise = new editor(w,20,"prise:",1,12,w/3,20,w/3*2,20);
-                    editor size = new editor(w,20,"size:",1,12,w/3,20,w/3*2,20);
-                    panel2.add(firma);
-                    panel2.add(war1);
-                    panel2.add(color);
-                    panel2.add(war2);
-                    panel2.add(model);
-                    panel2.add(war3);
-                    panel2.add(prise);
-                    panel2.add(war4);
-                    panel2.add(size);
-                    panel2.add(war5);
-                    //gui.setEnabled(false);
-                    button changes = new button("change",150,30);
-                    changes.getButton().addActionListener(new ActionListener(){
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if(firma.getText().getText().equals("")){
-                            war1.setVisible(true);
-                        }
-                        if(color.getText().getText().equals("")){
-                            war2.setVisible(true);
-                        }
-                        if(model.getText().getText().equals("")){
-                            war3.setVisible(true);
-                        }
-                        if(prise.getText().getText().equals("")){
-                            war4.setVisible(true);
-                        }
-                        if(size.getText().getText().equals("")){
-                            war5.setVisible(true);
-                        }
-                        if(count.getText().getText().equals("")){
-                            war6.setVisible(true);
-                        }
-                        if((!firma.getText().getText().equals(""))&&(!color.getText().getText().equals(""))&&
-                        (!model.getText().getText().equals(""))&&(!prise.getText().getText().equals(""))&&
-                        (!size.getText().getText().equals(""))){
-                            try{
-                                war7.setVisible(false);
-                                Shoes shoes = new Shoes();
-                                shoes.setFirma(firma.getText().getText());
-                                shoes.setColor(color.getText().getText());
-                                shoes.setModel(model.getText().getText());
-                                shoes.setPrice(Double.parseDouble(prise.getText().getText()));
-                                shoes.setSize(Integer.parseInt (size.getText().getText()));
-                                shoes.setPerson(personFacade.findById(id));
-                                shoesFacade.create(shoes);
 
-                                firma.getText().setText("");
-                                color.getText().setText("");
-                                model.getText().setText("");
-                                prise.getText().setText("");
-                                size.getText().setText("");
-                                my_advert.removeAll();
-                                list_shoes list3 = new list_shoes(w-50,"aaa",w,200);
-                                my_advert.add(list3);
-                                my_advert.revalidate();
-                                my_advert.repaint();
+                }
 
-                            }
-                            catch(Exception aq){
-                                war7.setVisible(true);
-                            }
+            });
+            sells.add(clean);
+            
+            button button_sell = new button("Sell shoes",100,30);
+            button_sell.getButton().addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                     if(firma.getText().getText().equals("")){
+                    war1.setVisible(true);
+                    }
+                    if(color.getText().getText().equals("")){
+                        war2.setVisible(true);
+                    }
+                    if(model.getText().getText().equals("")){
+                        war3.setVisible(true);
+                    }
+                    if(prise.getText().getText().equals("")){
+                        war4.setVisible(true);
+                    }
+                    if(size.getText().getText().equals("")){
+                        war5.setVisible(true);
+                    }
+                    if(count.getText().getText().equals("")){
+                        war6.setVisible(true);
+                    }
+                    if((!firma.getText().getText().equals(""))&&(!color.getText().getText().equals(""))&&
+                    (!model.getText().getText().equals(""))&&(!prise.getText().getText().equals(""))&&
+                    (!size.getText().getText().equals(""))&&(!count.getText().getText().equals(""))){
+                        try{
+                            Shoes shoes = new Shoes();
+                            war7.setVisible(false);
+                            shoes.setFirma(firma.getText().getText());
+                            shoes.setColor(color.getText().getText());
+                            shoes.setModel(model.getText().getText());
+                            shoes.setPrice(Double.parseDouble(prise.getText().getText()));
+                            shoes.setSize(Integer.parseInt (size.getText().getText()));
+                            shoes.setCount(Integer.parseInt (count.getText().getText()));
+                            shoesFacade.create(shoes);
+                            
+                            Sale sale =new Sale();
+                            sale.setPerson(personFacade.findById(id));
+                            sale.setShoes(shoes);
+                            saleFacade.create(sale);
+                            firma.getText().setText("");
+                            color.getText().setText("");
+                            model.getText().setText("");
+                            prise.getText().setText("");
+                            size.getText().setText("");
+                            count.getText().setText("");
+                            
+                            list_purchases = new list_sale(w-50,"aaa",w,300);
+                            shopping.removeAll();
+                            shopping.add(my_purchases);
 
+                            purchases.removeAll();
+                            purchases.add(my_money);
+                            purchases.add(list_purchases);
+                        }
+                        catch(Exception aq){
+                            war7.setVisible(true);
                         }
                     }
-                });
-                panel2.add(changes);
                 }
-                
-            }
-        });
-        my_advert.add(change);
+            });
+            sells.add(button_sell);
+            
+            
+            tabs.add("Buy products",purchases);
+            purchases.add(my_money);
+            purchases.add(list_purchases);
+            button button_buy = new button("Buy product", 150, 30);
+            purchases.add(button_buy);
+            button_buy.getButton().addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                     Sale value = list_purchases.getList().getSelectedValue();
+                    if(personFacade.findById(id).getPurse()>= value.getShoes().getPrice() && value.getShoes().getCount()>0){
+                        personFacade.findById(id).setPurse(Math.ceil(
+                        personFacade.findById(id).getPurse()*100-value.getShoes().getPrice()*100)/100);
+                        value.getShoes().setCount(value.getShoes().getCount()-1);
+                        value.getPerson().setIncome(Math.ceil(
+                        value.getPerson().getIncome()*100+value.getShoes().getPrice()*100)/100);
+                        value.getPerson().setPurse(Math.ceil(
+                        value.getPerson().getPurse()*100+value.getShoes().getPrice()*100)/100);
+                        personFacade.edit(personFacade.findById(id));
+                        personFacade.edit(value.getPerson());
+                        shoesFacade.edit(value.getShoes());
+                        panel.revalidate();
+                        panel.repaint();
+                        
+                        Purchase purchase = new Purchase();
+                        purchase.setPerson(personFacade.findById(id));
+                        purchase.setShoes(value.getShoes());
+                        purchaseFacade.create(purchase);
+                        
+                        my_purchases = new list_purchase(w-50,"aaa",w,300);
+                        list_purchases = new list_sale(w+200,"aaa",w,300);
+                        
+                        shopping.removeAll();
+                        shopping.add(my_purchases);
+                        
+                        purchases.removeAll();
+                        purchases.add(my_money);
+                        purchases.add(list_purchases);
+                }
+            }});
+            
     }
     
 }

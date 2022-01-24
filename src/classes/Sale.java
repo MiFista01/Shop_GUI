@@ -1,6 +1,5 @@
 package classes;
 
-import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,8 +7,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
+
 @Entity
-public class Purchase {
+public class Sale {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,24 +22,29 @@ public class Purchase {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Person getPerson() {
         return person;
-    }
-
-    public void setPerson(Person person) {
-        this.person = person;
     }
 
     public Shoes getShoes() {
         return shoes;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+
     public void setShoes(Shoes shoes) {
         this.shoes = shoes;
+    }
+
+    @Override
+    public String toString() {
+        return "Sale{" + "id=" + id + ", person=" + person + ", shoes=" + shoes + '}';
     }
     
 }
