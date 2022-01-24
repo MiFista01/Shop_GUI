@@ -16,7 +16,7 @@ public class Purchase {
     @OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Person person;
     @OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private Shoes shoes;
+    private Sale sale;
 
     public Long getId() {
         return id;
@@ -34,12 +34,13 @@ public class Purchase {
         this.person = person;
     }
 
-    public Shoes getShoes() {
-        return shoes;
+    public Sale getSale() {
+        return sale;
     }
 
-    public void setShoes(Shoes shoes) {
-        this.shoes = shoes;
+    public void setSale(Sale sale) {
+        this.sale = sale;
     }
+    
     
 }

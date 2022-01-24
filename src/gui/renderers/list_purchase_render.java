@@ -26,13 +26,13 @@ public class list_purchase_render extends DefaultListCellRenderer{
                 label = (JLabel) component;
             
                 label.setText(String.format(
-                    "Name: "+purchase.getPerson().getName()+"  "+
-                    "Phone: "+purchase.getPerson().getPhone()+"  "+
-                    "Firma: "+purchase.getShoes().getFirma()+"  "+
-                    "Color: "+purchase.getShoes().getColor()+"  "+
-                    "Model: "+purchase.getShoes().getModel()+"  "+
-                    "Size: "+purchase.getShoes().getSize()+"  "+
-                    "Price: "+purchase.getShoes().getPrice()+"  "
+                    "Name: "+purchase.getSale().getPerson().getName()+"  "+
+                    "Phone: "+purchase.getSale().getPerson().getPhone()+"  "+
+                    "Firma: "+purchase.getSale().getShoes().getFirma()+"  "+
+                    "Color: "+purchase.getSale().getShoes().getColor()+"  "+
+                    "Model: "+purchase.getSale().getShoes().getModel()+"  "+
+                    "Size: "+purchase.getSale().getShoes().getSize()+"  "+
+                    "Price: "+purchase.getSale().getShoes().getPrice()+"  "
             ));
             }else{
                 component = new Component() {}; 
